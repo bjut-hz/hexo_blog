@@ -20,97 +20,102 @@ tags:
 
 ![示例](http://i.imgur.com/7S95DNV.png)
 
-    //公式（1）
-    int sumInt( int a, int b ){
-        int result { 0 };
-        for ( int i = a; i <= b; ++i ) {
-            result += i;
-        }
-        return result;
+``` C++
+//公式（1）
+int sumInt( int a, int b ){
+    int result { 0 };
+    for ( int i = a; i <= b; ++i ) {
+        result += i;
     }
-    
-    //公式（2）
-    int sumCube( int a, int b ){
-        int result { 0 };
-        for ( int i = a; i <= b; ++i ) {
-            result += i * i * i;
-        }
-        return result;
+    return result;
+}
+
+//公式（2）
+int sumCube( int a, int b ){
+    int result { 0 };
+    for ( int i = a; i <= b; ++i ) {
+        result += i * i * i;
     }
-    
-    //公式（3）
-    double sumPi( int a, int b ){
-        double result = 0;
-        for ( int i = 1; i <= b; i += 4 ) {
-            result += 1 / ( (double)(i) * (double)( i + 2 ) );
-        }
-        return result;
+    return result;
+}
+
+//公式（3）
+double sumPi( int a, int b ){
+    double result = 0;
+    for ( int i = 1; i <= b; i += 4 ) {
+        result += 1 / ( (double)(i) * (double)( i + 2 ) );
     }
+    return result;
+}
+```
     
 上述示例中，三个程序表面不同，但是程序包含的逻辑（对于不同序列进行求和）是相同的。对于计算机程序，这种类似就意味着抽象，进行更高层次的抽象，以较少重复劳动，减小出现错误的风险。
 
 上述代码可以抽象为：
 
-    //advanced abstraction
-    template < class T, class F, class G >
-    T sumGeneric( T a, T b, F func, G next ){
-        T result( 0 );
-        for ( T i = a; i <= b; next( i ) ) {
-            result += func( i ); 
-        }
-        return result;
+``` C++
+//advanced abstraction
+template < class T, class F, class G >
+T sumGeneric( T a, T b, F func, G next ){
+    T result( 0 );
+    for ( T i = a; i <= b; next( i ) ) {
+        result += func( i ); 
     }
+    return result;
+}
+```
 
 上述代码，允许用户将循环体内的过程func和nex以参数的形式传入。只要它们能以函数的形式调用即可，在C++中，我们可以使用函数对象做到这一点。
 
 **实现如下：**
+``` C++
+template < class T >
+class Self{
+public:
+    T operator()( T x ){ return x;  }
+};
 
-    template < class T >
-    class Self{
-    public:
-        T operator()( T x ){ return x;  }
-    };
-    
-    template < class T >
-    class Cube{
-    public:
-        T operator()( T x ){ return x*x*x; }
-    };
-    
-    template< class T >
-    class MyFunc{
-    public:
-        T operator()( T x ){
-            return 1 / ( x * ( x + 2 ) );
-        }
-    };
-    
-    template < class T >
-    class Inc{
-    public:
-        void operator()( T& x ){ ++x; }
-    };
-    
-    template < class T >
-    class Inc4{
-    public:
-        void operator()( T& x ){ x += 4; }
-    };
-    
-**测试结果：**
+template < class T >
+class Cube{
+public:
+    T operator()( T x ){ return x*x*x; }
+};
 
-    int main(){
-        cout << "Normal Cal:" << endl;
-        cout << "sumInt( 1, 50 ):" << sumInt( 1, 50 ) << " sumCube( 1, 50 ):" << sumCube( 1, 50 ) << " sumPi( 1, 50 ):" << sumPi( 1, 50 );
-    
-        cout << endl << "High Order Function:" << endl;
-        cout << "sumInt( 1, 50 ):" << sumGeneric( 1, 50, Self<int>(), Inc<int>() ) 
-            << " sumCube( 1, 50 ):" << sumGeneric( 1, 50, Cube<int>(), Inc<int>() )
-            << " sumPi( 1, 50 ):" << sumGeneric( (double)1, (double)50, MyFunc<double>(), Inc4<double>() );
-    
-        system( "pause" );
+template< class T >
+class MyFunc{
+public:
+    T operator()( T x ){
+        return 1 / ( x * ( x + 2 ) );
     }
-    
+};
+
+template < class T >
+class Inc{
+public:
+    void operator()( T& x ){ ++x; }
+};
+
+template < class T >
+class Inc4{
+public:
+    void operator()( T& x ){ x += 4; }
+};
+```
+
+**测试结果：**
+``` C++
+int main(){
+    cout << "Normal Cal:" << endl;
+    cout << "sumInt( 1, 50 ):" << sumInt( 1, 50 ) << " sumCube( 1, 50 ):" << sumCube( 1, 50 ) << " sumPi( 1, 50 ):" << sumPi( 1, 50 );
+
+    cout << endl << "High Order Function:" << endl;
+    cout << "sumInt( 1, 50 ):" << sumGeneric( 1, 50, Self<int>(), Inc<int>() ) 
+        << " sumCube( 1, 50 ):" << sumGeneric( 1, 50, Cube<int>(), Inc<int>() )
+        << " sumPi( 1, 50 ):" << sumGeneric( (double)1, (double)50, MyFunc<double>(), Inc4<double>() );
+
+    system( "pause" );
+}
+```
 ![结果](http://i.imgur.com/nvvFPya.png)
 
 ### lambda表达式实现高阶函数
