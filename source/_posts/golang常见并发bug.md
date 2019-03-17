@@ -219,3 +219,9 @@ golang语言不仅支持了共享内存的方式，还支持消息传递的方�
     **出错原因：** 第一行创建timer后，go运行时就开始通过internal goroutine计时。如果dur不大于0时，那么timer.C会立即满足条件，导致该函数提早结束，ctx.Done没有机会执行。
 
     **解决方案：** 使用Time结构，不立即进行计时操作。只有在dur大于0时，才开始计时操作
+
+
+
+## reference
+
+[1] Tengfei Tu, Xiaoyu Liu, Linhai Song, and Yiying Zhang. 2019. Understanding Real-World Concurrency Bugs in Go . In Proceedings of 2019 Architectural Support for Programming Languages and Operating Systems (ASPLOS’19). ACM, New York, NY, USA, 14 pages. https://doi.org/http://dx.doi.org/10.1145/3297858.3304069
