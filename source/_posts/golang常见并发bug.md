@@ -79,7 +79,7 @@ golang语言不仅支持了共享内存的方式，还支持消息传递的方�
     8 	}
     ```
 
-    **错误原因：** 在第一行代码中在创建了hctx及hcancel的同时，也创建了一个新的goroutine，可以通过hcancel来向该goroutine发送消息，进行并发控制。但是在后续的代码中hcancel被赋予了新的值，那么就没有其他的方式来关闭新创建的goroutine。
+    **错误原因：** 在第一行代码中在创建了hctx及hcancel。根据context的惯用方式，会有其他的goroutine通过`hctx.Done()`来检测操作是否取消。可以通过hcancel调用来进行取消操作，从而进行并发控制。但是在后续的代码中hcancel被赋予了新的值，那么就没有其他的方式来通知等待`hctx.Done()`的goroutine。
 
     **解决方案：** 只进行变量的定义，然后根据不同的情形进行赋值
 
